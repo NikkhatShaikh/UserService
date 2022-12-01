@@ -1,1 +1,15 @@
+
+Feign Client
+
+Feign is a declarative web service client.
+It makes writing web service clients easier.
+To use Feign create an interface and annotate it
+
+
 Dependencies
+SERACH BY - openfeign
+
+<dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+    </dependency>
