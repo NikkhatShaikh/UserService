@@ -1,12 +1,17 @@
 package com.nikkhat.user.service.services.impl;
 
+import com.nikkhat.user.service.entity.Rating;
 import com.nikkhat.user.service.entity.User;
 import com.nikkhat.user.service.exceptions.ResourceNotFoundException;
 import com.nikkhat.user.service.repository.UserRepository;
 import com.nikkhat.user.service.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +20,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
    private UserRepository userRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
 
     @Override
@@ -31,9 +41,23 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.findAll();
     }
 
+
+    //get single user
     @Override
     public User getUser(String userId) {
-        return this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(" user With Given Id is not found On Server !!  given User Id :"+userId));
+
+              User user= this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(" user With Given Id is not found On Server !!  given User Id :"+userId));
+
+            //fetch rating of the above User From Rating service
+
+        // localhost:8084/api/getAllRatingsbyUserId/64afc0a3-072c-48a3-b5bc-26cb20ee5c2e
+
+        ArrayList <Rating> ratingsOfUsers = restTemplate.getForObject("http://localhost:8084/api/getAllRatingsbyUserId/"+user.getUserId(), ArrayList.class);
+
+        logger.info("{}", ratingsOfUsers);
+        user.setRatings(ratingsOfUsers);
+              return user;
+
     }
 
     @Override
